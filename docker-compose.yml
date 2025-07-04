@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=supabase-db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=postgres
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+      - QUEUE_MODE=redis
+      - REDIS_HOST=redis
+    depends_on:
+      - supabase-db
+      - redis
+    networks:
+      - evolution-net
+    restart: always
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - evolution-net
+    restart: always
+
+  supabase-db:
+    image: postgres:15
+    container_name: supabase-db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - supabase_db_data:/var/lib/postgresql/data
+    networks:
+      - evolution-net
+    restart: always
+
+  evolution-api:
+    image: atendai/evolution-api:v1.8.7
+    container_name: evolution-api
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTHENTICATION_API_KEY=mude-me
+    #   - DATABASE_PROVIDER=prisma
+    #   - DATABASE_URL=postgres://postgres:postgres@supabase-db:5432/postgres
+
+    volumes:
+      - evolution_instances:/evolution/instances
+    networks:
+      - evolution-net
+    restart: always
+
+
+volumes:
+  supabase_db_data:
+  evolution_instances:
+  # evolution_store:
+
+networks:
+  evolution-net:
+    driver: bridge
