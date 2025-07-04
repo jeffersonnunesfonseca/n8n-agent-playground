@@ -25,7 +25,7 @@ git clone https://github.com/jeffersonnunesfonseca/n8n-agent-playgroung.git n8n
 cd n8n
 ```
 
-### Passo 2: Inicie o ambiente Docker
+### Passo 2: I nicie o ambiente Docker
 
 Para iniciar todos os serviços do ambiente, execute:
 
